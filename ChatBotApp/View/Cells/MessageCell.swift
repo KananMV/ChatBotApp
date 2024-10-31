@@ -18,18 +18,48 @@ class MessageCell: UITableViewCell {
         return label
     }()
     
+    let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "logologo")
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
     func configure(with message: Message) {
         messageLabel.text = message.textChunks.joined()
         messageContainerView.backgroundColor = message.isSentByUser ? .systemBlue : UIColor(hex: "#243639")
         messageLabel.textAlignment = message.isSentByUser ? .left : .left
+        logoImageView.isHidden = message.isSentByUser
+        
         setupLayout(isSentByUser: message.isSentByUser)
     }
+    
     private func setupLayout(isSentByUser: Bool) {
         messageContainerView.removeFromSuperview()
         messageLabel.removeFromSuperview()
+        logoImageView.removeFromSuperview()
         
         contentView.addSubview(messageContainerView)
         messageContainerView.addSubview(messageLabel)
+        
+        if !isSentByUser {
+            messageContainerView.addSubview(logoImageView)
+            logoImageView.snp.remakeConstraints { make in
+                make.leading.equalTo(messageContainerView.snp.leading)
+                make.top.equalTo(messageContainerView.snp.top).offset(10)
+                make.width.height.equalTo(24)
+            }
+            messageLabel.snp.remakeConstraints { make in
+                make.leading.equalTo(logoImageView.snp.trailing).offset(8)
+                make.trailing.equalTo(messageContainerView.snp.trailing).offset(-12)
+                make.top.bottom.equalTo(messageContainerView).inset(12)
+            }
+        } else {
+            messageLabel.snp.remakeConstraints { make in
+                make.edges.equalTo(messageContainerView).inset(12)
+            }
+        }
 
         messageContainerView.snp.remakeConstraints { make in
             if isSentByUser {
@@ -42,12 +72,9 @@ class MessageCell: UITableViewCell {
             make.top.equalTo(contentView.snp.top).offset(8)
             make.bottom.equalTo(contentView.snp.bottom).offset(-8)
         }
-
-        messageLabel.snp.remakeConstraints { make in
-            make.edges.equalTo(messageContainerView).inset(12)
-        }
     }
 }
+
 extension UIColor {
     convenience init(hex: String) {
         let scanner = Scanner(string: hex)

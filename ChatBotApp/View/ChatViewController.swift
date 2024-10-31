@@ -49,7 +49,13 @@ class ChatViewController: UIViewController {
         view.backgroundColor = UIColor(named: "back")
         setupLayout()
         updateBackgroundView()
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        messageTableView.addGestureRecognizer(tapGesture)
         
+    }
+    @objc func dismissKeyboard() {
+        messageTextField.resignFirstResponder()
     }
     func updateBackgroundView() {
             if dataSourceIsEmpty() {
@@ -63,6 +69,7 @@ class ChatViewController: UIViewController {
         return messages.isEmpty
     }
     func setupLayout() {
+        
         title = "ChatBot"
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         navigationController?.navigationBar.backgroundColor = UIColor(named: "back")
@@ -72,7 +79,6 @@ class ChatViewController: UIViewController {
         view.addSubview(imageIconView)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
         
         messageTableView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
